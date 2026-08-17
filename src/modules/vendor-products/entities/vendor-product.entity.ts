@@ -5,11 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToOne,
   JoinColumn,
   Index,
 } from 'typeorm';
 import { Vendor } from '../../vendors/entities/vendor.entity';
 import { ProductVariant } from '../../products/entities/product-variant.entity';
+import { Inventory } from '../../inventory/entities/inventory.entity';
 
 @Entity('vendor_products')
 @Index(['vendor_id', 'product_variant_id'], { unique: true })
@@ -45,4 +47,8 @@ export class VendorProduct {
   @ManyToOne(() => ProductVariant, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'product_variant_id' })
   product_variant: ProductVariant;
+
+  @OneToOne(() => Inventory, (inventory) => inventory.vendor_product)
+  inventory: Inventory;
 }
+
