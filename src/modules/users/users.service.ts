@@ -22,10 +22,61 @@ export class UsersService {
     });
   }
 
-  findOne(id: number) {
+  findOne(id: number | string) {
+    const numericId = Number(id);
+    if (!id || Number.isNaN(numericId) || !Number.isInteger(numericId)) {
+      return null;
+    }
     return this.userRepository.findOne({
-      where: { id },
+      where: { id: numericId },
       relations: { user_roles: { role: true } },
     });
+  }
+
+  findById(id: number | string) {
+    return this.findOne(id);
+  }
+
+  findByEmail(email: string) {
+    return this.userRepository.findOne({
+      where: { email },
+      relations: { user_roles: { role: true } },
+    });
+  }
+
+  findByMobileNumber(mobileNumber: string) {
+    return this.userRepository.findOne({
+      where: { mobile_number: mobileNumber },
+      relations: { user_roles: { role: true } },
+    });
+  }
+
+  findRoleByName(name: string) {
+    return this.roleRepository.findOne({
+      where: { name: name.toLowerCase().trim() },
+    });
+  }
+
+  async assignRoleToUser(userId: number, roleId: number) {
+    const existing = await this.userRoleRepository.findOne({
+      where: { user_id: userId, role_id: roleId },
+    });
+    if (!existing) {
+      const userRole = this.userRoleRepository.create({
+        user_id: userId,
+        role_id: roleId,
+      });
+      return this.userRoleRepository.save(userRole);
+    }
+    return existing;
+  }
+
+  async create(userData: Partial<User>) {
+    const user = this.userRepository.create(userData);
+    return this.userRepository.save(user);
+  }
+
+  async updatePassword(id: number, hashedPassword: string) {
+    await this.userRepository.update(id, { password: hashedPassword });
   }
 }
