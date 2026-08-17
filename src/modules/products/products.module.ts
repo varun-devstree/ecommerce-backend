@@ -8,6 +8,8 @@ import { ProductImage } from './entities/product-image.entity';
 import { ProductAttribute } from './entities/product-attribute.entity';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
+import { CategoriesController } from './categories.controller';
+import { BrandsController } from './brands.controller';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { ProductsController } from './products.controller';
       ProductAttribute,
     ]),
   ],
-  controllers: [ProductsController],
+  controllers: [ProductsController, CategoriesController, BrandsController],
   providers: [ProductsService],
   exports: [ProductsService, TypeOrmModule],
 })

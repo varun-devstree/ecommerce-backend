@@ -10,31 +10,31 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 
-@Controller('products')
-export class ProductsController {
+@Controller('categories')
+export class CategoriesController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
   findAll() {
-    return this.productsService.findAll();
+    return this.productsService.findAllCategories();
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.findOne(id);
+    return this.productsService.findCategoryById(id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.createProduct(createProductDto);
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.productsService.createCategory(createCategoryDto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -42,15 +42,15 @@ export class ProductsController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateProductDto: UpdateProductDto,
+    @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.productsService.updateProduct(id, updateProductDto);
+    return this.productsService.updateCategory(id, updateCategoryDto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.removeProduct(id);
+    return this.productsService.removeCategory(id);
   }
 }
