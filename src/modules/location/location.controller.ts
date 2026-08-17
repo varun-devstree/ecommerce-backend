@@ -1,5 +1,16 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { LocationService } from './location.service';
+import { CreateAddressDto } from './dto/create-address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('location')
 export class LocationController {
@@ -20,8 +31,37 @@ export class LocationController {
     return this.locationService.findCitiesByState(stateId);
   }
 
+  // Address CRUD Endpoints
+  @Post('addresses')
+  createAddress(@Body() createAddressDto: CreateAddressDto) {
+    return this.locationService.createAddress(createAddressDto);
+  }
+
   @Get('addresses/user/:userId')
   findAddressesByUser(@Param('userId', ParseIntPipe) userId: number) {
     return this.locationService.findAddressesByUser(userId);
+  }
+
+  @Get('addresses/:id')
+  findAddressById(@Param('id', ParseIntPipe) id: number) {
+    return this.locationService.findAddressById(id);
+  }
+
+  @Patch('addresses/:id')
+  updateAddress(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateAddressDto: UpdateAddressDto,
+  ) {
+    return this.locationService.updateAddress(id, updateAddressDto);
+  }
+
+  @Delete('addresses/:id')
+  removeAddress(@Param('id', ParseIntPipe) id: number) {
+    return this.locationService.removeAddress(id);
+  }
+
+  @Patch('addresses/:id/set-default')
+  setDefaultAddress(@Param('id', ParseIntPipe) id: number) {
+    return this.locationService.setDefaultAddress(id);
   }
 }

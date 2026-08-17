@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Country } from './country.entity';
@@ -50,11 +51,17 @@ export class Address {
   @Column({ type: 'boolean', default: false })
   is_default: boolean;
 
+  @Column({ type: 'varchar', length: 20, default: 'active' })
+  status: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })

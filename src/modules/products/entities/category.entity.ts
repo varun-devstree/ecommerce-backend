@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   OneToMany,
   JoinColumn,
@@ -34,6 +35,9 @@ export class Category {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
 
   @ManyToOne(() => Category, (category) => category.children, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'parent_id' })

@@ -4,3 +4,9 @@ export enum UserStatus {
   SUSPENDED = 'suspended',
   DELETED = 'deleted',
 }
+
+export enum ProductStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  DELETED = 'deleted',
+}
