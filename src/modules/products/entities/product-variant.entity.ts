@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -32,7 +33,11 @@ export class ProductVariant {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
+
   @ManyToOne(() => Product, (product) => product.variants, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 }
+

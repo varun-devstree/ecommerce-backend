@@ -184,7 +184,10 @@ export class VendorProductsService {
 
   async remove(id: number): Promise<{ message: string }> {
     const vp = await this.findOne(id);
-    await this.vendorProductRepository.remove(vp);
-    return { message: `Vendor product with ID ${id} successfully removed` };
+    vp.status = 'deleted';
+    await this.vendorProductRepository.save(vp);
+    await this.vendorProductRepository.softRemove(vp);
+    return { message: `Vendor product with ID ${id} soft deleted successfully` };
   }
 }
+

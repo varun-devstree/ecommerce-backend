@@ -40,6 +40,7 @@ describe('ProductsService', () => {
     create: jest.fn(),
     save: jest.fn(),
     remove: jest.fn(),
+    softRemove: jest.fn(),
   };
 
   const mockAttributeRepository = {
@@ -48,6 +49,7 @@ describe('ProductsService', () => {
     create: jest.fn(),
     save: jest.fn(),
     remove: jest.fn(),
+    softRemove: jest.fn(),
   };
 
   const mockImageRepository = {
@@ -56,7 +58,9 @@ describe('ProductsService', () => {
     create: jest.fn(),
     save: jest.fn(),
     remove: jest.fn(),
+    softRemove: jest.fn(),
   };
+
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   OneToOne,
   JoinColumn,
@@ -39,6 +40,10 @@ export class VendorProduct {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
+
 
   @ManyToOne(() => Vendor, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'vendor_id' })
