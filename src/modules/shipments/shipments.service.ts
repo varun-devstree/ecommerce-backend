@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Shipment } from './entities/shipment.entity';
 import { Order } from '../orders/entities/order.entity';
 import { OrderVendor } from '../orders/entities/order-vendor.entity';
@@ -13,7 +13,7 @@ import { OrdersService } from '../orders/orders.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentStatusDto } from './dto/update-shipment-status.dto';
 import { FilterShipmentDto } from './dto/filter-shipment.dto';
-import { ShipmentStatus, OrderStatus } from '../../common/enums/enums';
+import { ShipmentStatus, OrderStatus, DeliveryAgentStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class ShipmentsService {
@@ -28,6 +28,32 @@ export class ShipmentsService {
     private readonly deliveryAgentRepository: Repository<DeliveryAgent>,
     private readonly ordersService: OrdersService,
   ) {}
+
+  private async updateAgentBusyStatus(agentId: number) {
+    if (!agentId) return;
+    const activeShipments = await this.shipmentRepository.find({
+      where: {
+        delivery_agent_id: agentId,
+        shipment_status: In([
+          ShipmentStatus.PENDING,
+          ShipmentStatus.IN_TRANSIT,
+          ShipmentStatus.OUT_FOR_DELIVERY,
+        ]),
+      },
+    });
+
+    const agent = await this.deliveryAgentRepository.findOne({
+      where: { id: agentId },
+    });
+    if (agent) {
+      if (activeShipments.length > 0) {
+        agent.status = DeliveryAgentStatus.BUSY;
+      } else {
+        agent.status = DeliveryAgentStatus.AVAILABLE;
+      }
+      await this.deliveryAgentRepository.save(agent);
+    }
+  }
 
   async createShipment(dto: CreateShipmentDto): Promise<Shipment> {
     const order = await this.orderRepository.findOne({
@@ -75,6 +101,11 @@ export class ShipmentsService {
     });
 
     const savedShipment = await this.shipmentRepository.save(shipment);
+
+    if (dto.delivery_agent_id) {
+      await this.updateAgentBusyStatus(dto.delivery_agent_id);
+    }
+
     return this.findOne(savedShipment.id);
   }
 
@@ -171,8 +202,9 @@ export class ShipmentsService {
     return this.shipmentRepository.find({
       where: { delivery_agent_id: agentId },
       relations: {
-        order: { address: true },
-        order_vendor: { vendor: true },
+        order: { address: true, user: true },
+        order_vendor: { vendor: true, items: true },
+        delivery_agent: { user: true },
       },
     });
   }
@@ -182,7 +214,8 @@ export class ShipmentsService {
     dto: UpdateShipmentStatusDto,
   ): Promise<Shipment> {
     const shipment = await this.findOne(id);
-    const newStatus = dto.shipment_status;
+    const oldAgentId = shipment.delivery_agent_id;
+    const newStatus = dto.shipment_status || shipment.shipment_status;
 
     shipment.shipment_status = newStatus;
 
@@ -223,6 +256,14 @@ export class ShipmentsService {
 
     await this.shipmentRepository.save(shipment);
 
+    // Update agent busy status for both old and new agent
+    if (oldAgentId) {
+      await this.updateAgentBusyStatus(oldAgentId);
+    }
+    if (shipment.delivery_agent_id && shipment.delivery_agent_id !== oldAgentId) {
+      await this.updateAgentBusyStatus(shipment.delivery_agent_id);
+    }
+
     // Sync order status via OrdersService if shipped or delivered
     if (newStatus === ShipmentStatus.DELIVERED) {
       await this.ordersService.updateOrderStatus(shipment.order_id, {
@@ -247,7 +288,11 @@ export class ShipmentsService {
     shipment.shipment_status = ShipmentStatus.CANCELLED;
     await this.shipmentRepository.save(shipment);
     await this.shipmentRepository.softRemove(shipment);
+
+    if (shipment.delivery_agent_id) {
+      await this.updateAgentBusyStatus(shipment.delivery_agent_id);
+    }
+
     return { message: `Shipment with ID ${id} successfully soft deleted` };
   }
 }
-

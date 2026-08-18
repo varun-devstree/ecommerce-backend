@@ -23,6 +23,13 @@ export class DeliveryAgentsController {
     return this.deliveryAgentsService.findAll();
   }
 
+  @Get('user/:userId')
+  @HttpCode(HttpStatus.OK)
+  @ResponseMessage(RESPONSE_MESSAGES.DELIVERY_AGENTS.FETCH_ONE_SUCCESS)
+  findByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.deliveryAgentsService.findByUserId(userId);
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage(RESPONSE_MESSAGES.DELIVERY_AGENTS.FETCH_ONE_SUCCESS)
