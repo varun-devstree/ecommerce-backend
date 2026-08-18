@@ -21,6 +21,7 @@ export class OrderStatusHistory {
   @Column({
     type: 'enum',
     enum: OrderStatus,
+    default: OrderStatus.PLACED,
   })
   status: OrderStatus;
 

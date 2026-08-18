@@ -22,4 +22,11 @@ export class DeliveryAgentsService {
       relations: { user: true },
     });
   }
+
+  findByUserId(userId: number) {
+    return this.deliveryAgentRepository.findOne({
+      where: { user_id: userId },
+      relations: { user: true },
+    });
+  }
 }

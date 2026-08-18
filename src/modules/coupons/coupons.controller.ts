@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { CouponsService } from './coupons.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
@@ -19,14 +20,19 @@ import { RecordCouponUsageDto } from './dto/record-coupon-usage.dto';
 import { FilterCouponDto } from './dto/filter-coupon.dto';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { RESPONSE_MESSAGES } from '../../common/constants';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('coupons')
 export class CouponsController {
-  constructor(private readonly couponsService: CouponsService) {}
+  constructor(private readonly couponsService: CouponsService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ResponseMessage(RESPONSE_MESSAGES.COUPONS.CREATE_SUCCESS)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   create(@Body() dto: CreateCouponDto) {
     return this.couponsService.createCoupon(dto);
   }
