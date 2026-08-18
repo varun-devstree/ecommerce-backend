@@ -4,7 +4,9 @@ import {
   IsOptional,
   IsString,
   IsDateString,
+  IsEnum,
 } from 'class-validator';
+import { ShipmentStatus } from '../../../common/enums/enums';
 
 export class CreateShipmentDto {
   @IsNotEmpty()
@@ -32,8 +34,8 @@ export class CreateShipmentDto {
   carrier?: string;
 
   @IsOptional()
-  @IsString()
-  shipment_status?: string = 'pending';
+  @IsEnum(ShipmentStatus)
+  shipment_status?: ShipmentStatus = ShipmentStatus.PENDING;
 
   @IsOptional()
   @IsDateString()

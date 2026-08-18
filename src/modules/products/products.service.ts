@@ -19,6 +19,7 @@ import { CreateProductAttributeDto } from './dto/create-product-attribute.dto';
 import { UpdateProductAttributeDto } from './dto/update-product-attribute.dto';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { UpdateProductImageDto } from './dto/update-product-image.dto';
+import { ProductStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class ProductsService {
@@ -230,7 +231,7 @@ export class ProductsService {
 
   async removeProduct(id: number) {
     const product = await this.findOne(id);
-    product.status = 'deleted';
+    product.status = ProductStatus.DELETED;
     await this.productRepository.save(product);
     await this.productRepository.softRemove(product);
     return { message: `Product '${product.name}' soft deleted successfully` };
@@ -283,7 +284,7 @@ export class ProductsService {
 
   async removeVariant(id: number) {
     const variant = await this.findVariantById(id);
-    variant.status = 'deleted';
+    variant.status = ProductStatus.DELETED;
     await this.variantRepository.save(variant);
     await this.variantRepository.softRemove(variant);
     return { message: `Variant with ID ${id} soft deleted successfully` };

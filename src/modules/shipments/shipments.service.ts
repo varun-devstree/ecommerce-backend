@@ -13,6 +13,7 @@ import { OrdersService } from '../orders/orders.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentStatusDto } from './dto/update-shipment-status.dto';
 import { FilterShipmentDto } from './dto/filter-shipment.dto';
+import { ShipmentStatus, OrderStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class ShipmentsService {
@@ -67,7 +68,7 @@ export class ShipmentsService {
       shipping_method: dto.shipping_method || 'Standard Ground',
       tracking_number: trackingNumber,
       carrier: dto.carrier || 'Express Logistics',
-      shipment_status: dto.shipment_status || 'pending',
+      shipment_status: dto.shipment_status || ShipmentStatus.PENDING,
       estimated_delivery_date: dto.estimated_delivery_date
         ? new Date(dto.estimated_delivery_date)
         : undefined,
@@ -181,7 +182,7 @@ export class ShipmentsService {
     dto: UpdateShipmentStatusDto,
   ): Promise<Shipment> {
     const shipment = await this.findOne(id);
-    const newStatus = dto.shipment_status.toLowerCase();
+    const newStatus = dto.shipment_status;
 
     shipment.shipment_status = newStatus;
 
@@ -204,7 +205,8 @@ export class ShipmentsService {
     if (dto.shipped_at) {
       shipment.shipped_at = new Date(dto.shipped_at);
     } else if (
-      (newStatus === 'shipped' || newStatus === 'in_transit') &&
+      (newStatus === ShipmentStatus.IN_TRANSIT ||
+        newStatus === ShipmentStatus.OUT_FOR_DELIVERY) &&
       !shipment.shipped_at
     ) {
       shipment.shipped_at = new Date();
@@ -212,16 +214,27 @@ export class ShipmentsService {
 
     if (dto.delivered_at) {
       shipment.delivered_at = new Date(dto.delivered_at);
-    } else if (newStatus === 'delivered' && !shipment.delivered_at) {
+    } else if (
+      newStatus === ShipmentStatus.DELIVERED &&
+      !shipment.delivered_at
+    ) {
       shipment.delivered_at = new Date();
     }
 
     await this.shipmentRepository.save(shipment);
 
     // Sync order status via OrdersService if shipped or delivered
-    if (newStatus === 'shipped' || newStatus === 'delivered') {
+    if (newStatus === ShipmentStatus.DELIVERED) {
       await this.ordersService.updateOrderStatus(shipment.order_id, {
-        status: newStatus,
+        status: OrderStatus.DELIVERED,
+        description: `Shipment #${shipment.id} (${shipment.carrier}) updated to ${newStatus}`,
+      });
+    } else if (
+      newStatus === ShipmentStatus.IN_TRANSIT ||
+      newStatus === ShipmentStatus.OUT_FOR_DELIVERY
+    ) {
+      await this.ordersService.updateOrderStatus(shipment.order_id, {
+        status: OrderStatus.SHIPPED,
         description: `Shipment #${shipment.id} (${shipment.carrier}) updated to ${newStatus}`,
       });
     }
@@ -231,9 +244,10 @@ export class ShipmentsService {
 
   async remove(id: number): Promise<{ message: string }> {
     const shipment = await this.findOne(id);
-    shipment.shipment_status = 'cancelled';
+    shipment.shipment_status = ShipmentStatus.CANCELLED;
     await this.shipmentRepository.save(shipment);
     await this.shipmentRepository.softRemove(shipment);
     return { message: `Shipment with ID ${id} successfully soft deleted` };
   }
 }
+

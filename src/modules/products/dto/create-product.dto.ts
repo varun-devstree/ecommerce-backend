@@ -5,8 +5,10 @@ import {
   IsInt,
   IsArray,
   ValidateNested,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ProductStatus } from '../../../common/enums/enums';
 import { CreateProductVariantDto } from './create-product-variant.dto';
 import { CreateProductAttributeDto } from './create-product-attribute.dto';
 import { CreateProductImageDto } from './create-product-image.dto';
@@ -33,8 +35,8 @@ export class CreateProductDto {
   description?: string;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(ProductStatus)
+  status?: ProductStatus = ProductStatus.ACTIVE;
 
   @IsOptional()
   @IsArray()

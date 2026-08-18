@@ -9,6 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Product } from './product.entity';
+import { ProductStatus } from '../../../common/enums/enums';
 
 @Entity('product_variants')
 export class ProductVariant {
@@ -24,8 +25,12 @@ export class ProductVariant {
   @Column({ type: 'varchar', length: 255, nullable: true })
   variant_name: string;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: ProductStatus,
+    default: ProductStatus.ACTIVE,
+  })
+  status: ProductStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

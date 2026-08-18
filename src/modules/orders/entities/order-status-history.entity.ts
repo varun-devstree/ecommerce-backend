@@ -8,6 +8,8 @@ import {
 } from 'typeorm';
 import { Order } from './order.entity';
 
+import { OrderStatus } from '../../../common/enums/enums';
+
 @Entity('order_status_history')
 export class OrderStatusHistory {
   @PrimaryGeneratedColumn()
@@ -16,8 +18,11 @@ export class OrderStatusHistory {
   @Column({ type: 'integer' })
   order_id: number;
 
-  @Column({ type: 'varchar', length: 50 })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+  })
+  status: OrderStatus;
 
   @Column({ type: 'text', nullable: true })
   description: string;

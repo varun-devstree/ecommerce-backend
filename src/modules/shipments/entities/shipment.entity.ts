@@ -11,6 +11,7 @@ import {
 import { Order } from '../../orders/entities/order.entity';
 import { OrderVendor } from '../../orders/entities/order-vendor.entity';
 import { DeliveryAgent } from '../../delivery-agents/entities/delivery-agent.entity';
+import { ShipmentStatus } from '../../../common/enums/enums';
 
 @Entity('shipments')
 export class Shipment {
@@ -35,8 +36,12 @@ export class Shipment {
   @Column({ type: 'varchar', length: 100, nullable: true })
   carrier: string;
 
-  @Column({ type: 'varchar', length: 50, default: 'pending' })
-  shipment_status: string;
+  @Column({
+    type: 'enum',
+    enum: ShipmentStatus,
+    default: ShipmentStatus.PENDING,
+  })
+  shipment_status: ShipmentStatus;
 
   @Column({ type: 'timestamp', nullable: true })
   estimated_delivery_date: Date;

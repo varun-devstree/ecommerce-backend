@@ -7,6 +7,7 @@ import { City } from './entities/city.entity';
 import { Address } from './entities/address.entity';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
+import { CommonStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class LocationService {
@@ -87,7 +88,7 @@ export class LocationService {
 
   async removeAddress(id: number): Promise<{ message: string }> {
     const address = await this.findAddressById(id);
-    address.status = 'deleted';
+    address.status = CommonStatus.DELETED;
     await this.addressRepository.save(address);
     await this.addressRepository.softRemove(address);
     return { message: `Address with ID ${id} successfully deleted` };

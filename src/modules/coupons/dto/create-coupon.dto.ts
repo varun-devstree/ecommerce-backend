@@ -6,7 +6,9 @@ import {
   IsOptional,
   IsDateString,
   IsInt,
+  IsEnum,
 } from 'class-validator';
+import { CouponStatus } from '../../../common/enums/enums';
 
 export class CreateCouponDto {
   @IsNotEmpty()
@@ -46,6 +48,6 @@ export class CreateCouponDto {
   usage_limit?: number;
 
   @IsOptional()
-  @IsString()
-  status?: string = 'active';
+  @IsEnum(CouponStatus)
+  status?: CouponStatus = CouponStatus.ACTIVE;
 }

@@ -12,6 +12,7 @@ import { Address } from '../location/entities/address.entity';
 import { InventoryService } from '../inventory/inventory.service';
 import { CartService } from '../cart/cart.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { OrderStatus } from '../../common/enums/enums';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -180,11 +181,11 @@ describe('OrdersService', () => {
       };
 
       mockOrderRepository.findOne.mockResolvedValue(orderObj);
-      mockOrderRepository.save.mockResolvedValue({ ...orderObj, order_status: 'cancelled' });
+      mockOrderRepository.save.mockResolvedValue({ ...orderObj, order_status: OrderStatus.CANCELLED });
       mockOrderStatusHistoryRepository.create.mockImplementation((val) => val);
 
       await service.updateOrderStatus(1, {
-        status: 'cancelled',
+        status: OrderStatus.CANCELLED,
         description: 'User cancelled order',
       });
 
@@ -199,17 +200,17 @@ describe('OrdersService', () => {
     it('should deduct inventory when order status changes to shipped', async () => {
       const orderObj = {
         id: 1,
-        order_status: 'placed',
+        order_status: OrderStatus.PLACED,
         items: [{ vendor_product_id: 10, quantity: 2 }],
         order_vendors: [],
       };
 
       mockOrderRepository.findOne.mockResolvedValue(orderObj);
-      mockOrderRepository.save.mockResolvedValue({ ...orderObj, order_status: 'shipped' });
+      mockOrderRepository.save.mockResolvedValue({ ...orderObj, order_status: OrderStatus.SHIPPED });
       mockOrderStatusHistoryRepository.create.mockImplementation((val) => val);
 
       await service.updateOrderStatus(1, {
-        status: 'shipped',
+        status: OrderStatus.SHIPPED,
         description: 'Order shipped via FedEx',
       });
 

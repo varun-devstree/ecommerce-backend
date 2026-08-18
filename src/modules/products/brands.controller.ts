@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { RESPONSE_MESSAGES } from '../../common/constants';
 
 @Controller('brands')
 export class BrandsController {
@@ -25,14 +26,14 @@ export class BrandsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Brands fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.BRANDS.FETCH_ALL_SUCCESS)
   findAll() {
     return this.productsService.findAllBrands();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Brand details fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.BRANDS.FETCH_ONE_SUCCESS)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.findBrandById(id);
   }
@@ -41,7 +42,7 @@ export class BrandsController {
   @Roles('admin')
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Brand created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.BRANDS.CREATE_SUCCESS)
   create(@Body() createBrandDto: CreateBrandDto) {
     return this.productsService.createBrand(createBrandDto);
   }
@@ -50,7 +51,7 @@ export class BrandsController {
   @Roles('admin')
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Brand updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.BRANDS.UPDATE_SUCCESS)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateBrandDto: UpdateBrandDto,
@@ -62,7 +63,7 @@ export class BrandsController {
   @Roles('admin')
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Brand deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.BRANDS.DELETE_SUCCESS)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.removeBrand(id);
   }

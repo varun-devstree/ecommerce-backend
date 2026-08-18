@@ -16,6 +16,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { FilterReviewDto } from './dto/filter-review.dto';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { RESPONSE_MESSAGES } from '../../common/constants';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -23,21 +24,21 @@ export class ReviewsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Review submitted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.REVIEWS.CREATE_SUCCESS)
   create(@Body() dto: CreateReviewDto) {
     return this.reviewsService.createReview(dto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Reviews fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.REVIEWS.FETCH_ALL_SUCCESS)
   findAll(@Query() filterDto: FilterReviewDto) {
     return this.reviewsService.findAll(filterDto);
   }
 
   @Get('product/:productId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Reviews fetched by product ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.REVIEWS.FETCH_PRODUCT_SUCCESS)
   findByProduct(
     @Param('productId', ParseIntPipe) productId: number,
     @Query() filterDto: FilterReviewDto,
@@ -47,7 +48,7 @@ export class ReviewsController {
 
   @Get('user/:userId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Reviews fetched by user ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.REVIEWS.FETCH_USER_SUCCESS)
   findByUser(
     @Param('userId', ParseIntPipe) userId: number,
     @Query() filterDto: FilterReviewDto,
@@ -57,14 +58,14 @@ export class ReviewsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Review details fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.REVIEWS.FETCH_ONE_SUCCESS)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.reviewsService.findOne(id);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Review updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.REVIEWS.UPDATE_SUCCESS)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateReviewDto,
@@ -74,7 +75,7 @@ export class ReviewsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Review deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.REVIEWS.DELETE_SUCCESS)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.reviewsService.removeReview(id);
   }

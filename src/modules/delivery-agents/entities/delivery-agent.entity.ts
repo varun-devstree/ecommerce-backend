@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
+import { DeliveryAgentStatus } from '../../../common/enums/enums';
+
 @Entity('delivery_agents')
 export class DeliveryAgent {
   @PrimaryGeneratedColumn()
@@ -23,8 +25,12 @@ export class DeliveryAgent {
   @Column({ type: 'varchar', length: 50, nullable: true })
   vehicle_number: string;
 
-  @Column({ type: 'varchar', length: 30, default: 'available' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: DeliveryAgentStatus,
+    default: DeliveryAgentStatus.AVAILABLE,
+  })
+  status: DeliveryAgentStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

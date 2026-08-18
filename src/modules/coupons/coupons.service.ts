@@ -15,6 +15,7 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { ApplyCouponDto } from './dto/apply-coupon.dto';
 import { RecordCouponUsageDto } from './dto/record-coupon-usage.dto';
 import { FilterCouponDto } from './dto/filter-coupon.dto';
+import { CouponStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class CouponsService {
@@ -57,7 +58,7 @@ export class CouponsService {
       start_date: startDate,
       end_date: endDate,
       usage_limit: dto.usage_limit,
-      status: dto.status || 'active',
+      status: dto.status || CouponStatus.ACTIVE,
     });
 
     return this.couponRepository.save(coupon);
@@ -68,7 +69,7 @@ export class CouponsService {
   ): Promise<{ coupon: Coupon; discount_amount: number }> {
     const coupon = await this.findByCode(dto.code);
 
-    if (coupon.status !== 'active') {
+    if (coupon.status !== CouponStatus.ACTIVE) {
       throw new BadRequestException(
         `Coupon '${coupon.code}' is not currently active`,
       );
@@ -256,7 +257,7 @@ export class CouponsService {
 
   async remove(id: number): Promise<{ message: string }> {
     const coupon = await this.findOne(id);
-    coupon.status = 'deleted';
+    coupon.status = CouponStatus.DELETED;
     await this.couponRepository.save(coupon);
     await this.couponRepository.softRemove(coupon);
     return { message: `Coupon '${coupon.code}' successfully soft deleted` };

@@ -8,6 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { CouponUsage } from './coupon-usage.entity';
+import { CouponStatus } from '../../../common/enums/enums';
 
 @Entity('coupons')
 export class Coupon {
@@ -38,8 +39,12 @@ export class Coupon {
   @Column({ type: 'integer', nullable: true })
   usage_limit: number;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: CouponStatus,
+    default: CouponStatus.ACTIVE,
+  })
+  status: CouponStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

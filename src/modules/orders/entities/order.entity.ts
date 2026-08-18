@@ -15,6 +15,8 @@ import { OrderVendor } from './order-vendor.entity';
 import { OrderItem } from './order-item.entity';
 import { OrderStatusHistory } from './order-status-history.entity';
 
+import { OrderStatus } from '../../../common/enums/enums';
+
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn()
@@ -33,13 +35,20 @@ export class Order {
   discount_amount: number;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  tax_amount: number;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   shipping_amount: number;
 
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   total_price: number;
 
-  @Column({ type: 'varchar', length: 50, default: 'placed' })
-  order_status: string;
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PLACED,
+  })
+  order_status: OrderStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
