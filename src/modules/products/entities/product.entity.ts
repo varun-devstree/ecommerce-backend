@@ -14,6 +14,7 @@ import { Brand } from './brand.entity';
 import { ProductVariant } from './product-variant.entity';
 import { ProductImage } from './product-image.entity';
 import { ProductAttribute } from './product-attribute.entity';
+import { ProductStatus } from '../../../common/enums/enums';
 
 @Entity('products')
 export class Product {
@@ -41,8 +42,12 @@ export class Product {
   @Column({ type: 'integer', default: 0 })
   review_count: number;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: ProductStatus,
+    default: ProductStatus.ACTIVE,
+  })
+  status: ProductStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

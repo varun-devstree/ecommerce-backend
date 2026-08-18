@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Product } from '../../products/entities/product.entity';
+import { ReviewStatus } from '../../../common/enums/enums';
 
 @Entity('reviews')
 @Index(['user_id', 'product_id'], { unique: true })
@@ -33,8 +34,12 @@ export class Review {
   @Column({ type: 'text', nullable: true })
   comment: string;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: ReviewStatus,
+    default: ReviewStatus.ACTIVE,
+  })
+  status: ReviewStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

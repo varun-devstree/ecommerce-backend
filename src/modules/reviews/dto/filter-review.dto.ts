@@ -1,5 +1,6 @@
-import { IsOptional, IsInt, IsString, Min } from 'class-validator';
+import { IsOptional, IsInt, IsEnum, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ReviewStatus } from '../../../common/enums/enums';
 
 export class FilterReviewDto {
   @IsOptional()
@@ -13,8 +14,8 @@ export class FilterReviewDto {
   user_id?: number;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(ReviewStatus)
+  status?: ReviewStatus;
 
   @IsOptional()
   @Type(() => Number)

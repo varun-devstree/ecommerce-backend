@@ -18,6 +18,7 @@ import { CartService } from '../cart/cart.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { FilterOrderDto } from './dto/filter-order.dto';
+import { OrderStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class OrdersService {
@@ -92,16 +93,25 @@ export class OrdersService {
 
     // 2. Resolve items (from DTO payload or from User Cart)
     let orderItemsToProcess: { vendor_product_id: number; quantity: number }[] = [];
+    let userCartDetails: { subtotal: number; tax_amount: number; shipping_amount: number } | null = null;
 
     if (dto.items && dto.items.length > 0) {
       orderItemsToProcess = dto.items;
     } else {
-      const cart = await this.cartService.getCartByUserId(dto.user_id);
+      const cart = await this.cartService.getCartByUserId(
+        dto.user_id,
+        dto.address_id,
+      );
       if (!cart.items || cart.items.length === 0) {
         throw new BadRequestException(
           'Cart is empty and no order items were provided',
         );
       }
+      userCartDetails = {
+        subtotal: cart.subtotal,
+        tax_amount: cart.tax_amount,
+        shipping_amount: cart.shipping_amount,
+      };
       orderItemsToProcess = cart.items.map((ci) => ({
         vendor_product_id: ci.vendor_product_id,
         quantity: ci.quantity,
@@ -175,6 +185,7 @@ export class OrdersService {
     >();
 
     let overallSubtotal = 0;
+    let overallMrpTotal = 0;
 
     for (const itemData of resolvedItemsData) {
       const vId = itemData.vendorProduct.vendor_id;
@@ -189,14 +200,38 @@ export class OrdersService {
       group.items.push(itemData);
       group.subtotal += itemData.totalPrice;
       overallSubtotal += itemData.totalPrice;
+
+      const mrpPrice =
+        itemData.vendorProduct.mrp && Number(itemData.vendorProduct.mrp) > 0
+          ? Number(itemData.vendorProduct.mrp)
+          : itemData.price;
+      overallMrpTotal += mrpPrice * itemData.quantity;
     }
 
     overallSubtotal = Math.round(overallSubtotal * 100) / 100;
-    const shippingAmount = dto.shipping_amount || 0;
+    overallMrpTotal = Math.round(overallMrpTotal * 100) / 100;
+
+    const taxAmount =
+      userCartDetails !== null
+        ? userCartDetails.tax_amount
+        : Math.round(overallMrpTotal * 0.10 * 100) / 100;
+
+    const defaultShippingAmount =
+      userCartDetails !== null
+        ? userCartDetails.shipping_amount
+        : overallSubtotal >= 1000
+        ? 0
+        : 50;
+
+    const shippingAmount =
+      dto.shipping_amount !== undefined && dto.shipping_amount !== null
+        ? dto.shipping_amount
+        : defaultShippingAmount;
+
     const discountAmount = dto.discount_amount || 0;
     const totalPrice =
       Math.round(
-        (overallSubtotal - discountAmount + shippingAmount) * 100,
+        (overallSubtotal + taxAmount + shippingAmount - discountAmount) * 100,
       ) / 100;
 
     // 5. Generate Order Number
@@ -210,9 +245,10 @@ export class OrdersService {
       order_number: orderNumber,
       subtotal: overallSubtotal,
       discount_amount: discountAmount,
+      tax_amount: taxAmount,
       shipping_amount: shippingAmount,
       total_price: totalPrice,
-      order_status: 'placed',
+      order_status: OrderStatus.PLACED,
     });
     const savedOrder = await this.orderRepository.save(order);
 
@@ -239,7 +275,7 @@ export class OrdersService {
         subtotal: vendorSubtotal,
         shipping_amount: 0,
         total_amount: vendorSubtotal,
-        status: 'placed',
+        status: OrderStatus.PLACED,
       });
       const savedOrderVendor = await this.orderVendorRepository.save(orderVendor);
 
@@ -269,7 +305,7 @@ export class OrdersService {
     // 9. Record Order Status History Log
     const statusHistory = this.orderStatusHistoryRepository.create({
       order_id: savedOrder.id,
-      status: 'placed',
+      status: OrderStatus.PLACED,
       description: 'Order placed successfully',
     });
     await this.orderStatusHistoryRepository.save(statusHistory);
@@ -390,7 +426,7 @@ export class OrdersService {
   ): Promise<Order> {
     const order = await this.findOne(id);
     const previousStatus = order.order_status;
-    const newStatus = dto.status.toLowerCase();
+    const newStatus = dto.status;
 
     if (previousStatus === newStatus) {
       return order;
@@ -416,7 +452,10 @@ export class OrdersService {
     await this.orderStatusHistoryRepository.save(history);
 
     // Inventory coupling
-    if (newStatus === 'cancelled' && previousStatus !== 'cancelled') {
+    if (
+      newStatus === OrderStatus.CANCELLED &&
+      previousStatus !== OrderStatus.CANCELLED
+    ) {
       // Release reserved stock for all items
       if (order.items) {
         for (const item of order.items) {
@@ -429,9 +468,10 @@ export class OrdersService {
         }
       }
     } else if (
-      (newStatus === 'shipped' || newStatus === 'delivered') &&
-      previousStatus !== 'shipped' &&
-      previousStatus !== 'delivered'
+      (newStatus === OrderStatus.SHIPPED ||
+        newStatus === OrderStatus.DELIVERED) &&
+      previousStatus !== OrderStatus.SHIPPED &&
+      previousStatus !== OrderStatus.DELIVERED
     ) {
       // Deduct stock from reserved quantity
       if (order.items) {

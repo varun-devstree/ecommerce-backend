@@ -4,13 +4,14 @@ import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { User } from '../users/entities/user.entity';
 import { VendorProduct } from '../vendor-products/entities/vendor-product.entity';
+import { Address } from '../location/entities/address.entity';
 import { InventoryModule } from '../inventory/inventory.module';
 import { CartService } from './cart.service';
 import { CartController } from './cart.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Cart, CartItem, User, VendorProduct]),
+    TypeOrmModule.forFeature([Cart, CartItem, User, VendorProduct, Address]),
     InventoryModule,
   ],
   controllers: [CartController],
@@ -18,3 +19,4 @@ import { CartController } from './cart.controller';
   exports: [CartService, TypeOrmModule],
 })
 export class CartModule {}
+

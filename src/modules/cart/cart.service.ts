@@ -9,6 +9,7 @@ import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { User } from '../users/entities/user.entity';
 import { VendorProduct } from '../vendor-products/entities/vendor-product.entity';
+import { Address } from '../location/entities/address.entity';
 import { InventoryService } from '../inventory/inventory.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
@@ -24,6 +25,8 @@ export class CartService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(VendorProduct)
     private readonly vendorProductRepository: Repository<VendorProduct>,
+    @InjectRepository(Address)
+    private readonly addressRepository: Repository<Address>,
     private readonly inventoryService: InventoryService,
   ) {}
 
@@ -31,6 +34,7 @@ export class CartService {
     let cart = await this.cartRepository.findOne({
       where: { user_id: userId },
       relations: {
+        address: { country: true, state: true, city: true },
         items: {
           vendor_product: {
             product_variant: { product: true },
@@ -60,28 +64,99 @@ export class CartService {
 
   async getCartByUserId(
     userId: number,
-  ): Promise<Cart & { subtotal: number; total_items: number }> {
-    const cart = await this.getOrCreateCart(userId);
+    addressId?: number,
+  ): Promise<
+    Cart & {
+      subtotal: number;
+      total_mrp: number;
+      tax_amount: number;
+      shipping_amount: number;
+      total_price: number;
+      approximate_delivery_date: string | null;
+      total_items: number;
+    }
+  > {
+    let cart = await this.getOrCreateCart(userId);
+
+    if (addressId && cart.address_id !== addressId) {
+      const address = await this.addressRepository.findOne({
+        where: { id: addressId, user_id: userId },
+        relations: { country: true, state: true, city: true },
+      });
+      if (!address) {
+        throw new NotFoundException(
+          `Address with ID ${addressId} not found for user ${userId}`,
+        );
+      }
+      cart.address_id = addressId;
+      cart.address = address;
+      await this.cartRepository.save(cart);
+    }
 
     let subtotal = 0;
+    let total_mrp = 0;
     let total_items = 0;
 
     if (cart.items && cart.items.length > 0) {
       for (const item of cart.items) {
         const itemPrice = Number(item.price);
+        const itemMrp =
+          item.vendor_product?.mrp && Number(item.vendor_product.mrp) > 0
+            ? Number(item.vendor_product.mrp)
+            : itemPrice;
+
         subtotal += itemPrice * item.quantity;
+        total_mrp += itemMrp * item.quantity;
         total_items += item.quantity;
       }
     }
 
+    subtotal = Math.round(subtotal * 100) / 100;
+    total_mrp = Math.round(total_mrp * 100) / 100;
+
+    // Static tax 10% of MRP
+    const tax_amount = Math.round(total_mrp * 0.10 * 100) / 100;
+
+    // Shipping amount calculation (flat 50 if subtotal > 0 and subtotal < 1000, 0 if subtotal >= 1000 or 0 items)
+    const shipping_amount =
+      total_items > 0 ? (subtotal >= 1000 ? 0 : 50) : 0;
+
+    const total_price =
+      Math.round((subtotal + tax_amount + shipping_amount) * 100) / 100;
+
+    // Approximate delivery date calculation (current date + 5 days)
+    let approximate_delivery_date: string | null = null;
+    if (total_items > 0) {
+      const deliveryDate = new Date();
+      deliveryDate.setDate(deliveryDate.getDate() + 5);
+      approximate_delivery_date = deliveryDate.toISOString().split('T')[0];
+    }
+
     return {
       ...cart,
-      subtotal: Math.round(subtotal * 100) / 100,
+      subtotal,
+      total_mrp,
+      tax_amount,
+      shipping_amount,
+      total_price,
+      approximate_delivery_date,
       total_items,
     };
   }
 
-  async addToCart(dto: AddToCartDto): Promise<Cart & { subtotal: number; total_items: number }> {
+  async addToCart(
+    dto: AddToCartDto,
+  ): Promise<
+    Cart & {
+      subtotal: number;
+      total_mrp: number;
+      tax_amount: number;
+      shipping_amount: number;
+      total_price: number;
+      approximate_delivery_date: string | null;
+      total_items: number;
+    }
+  > {
     const vendorProduct = await this.vendorProductRepository.findOne({
       where: { id: dto.vendor_product_id },
     });
@@ -98,11 +173,27 @@ export class CartService {
       );
     }
 
+    if (dto.address_id) {
+      const address = await this.addressRepository.findOne({
+        where: { id: dto.address_id, user_id: dto.user_id },
+      });
+      if (!address) {
+        throw new NotFoundException(
+          `Address with ID ${dto.address_id} not found for user ${dto.user_id}`,
+        );
+      }
+    }
+
     const inventory = await this.inventoryService.findByVendorProduct(
       dto.vendor_product_id,
     );
 
     const cart = await this.getOrCreateCart(dto.user_id);
+
+    if (dto.address_id) {
+      cart.address_id = dto.address_id;
+      await this.cartRepository.save(cart);
+    }
 
     let cartItem = await this.cartItemRepository.findOne({
       where: {
@@ -135,7 +226,7 @@ export class CartService {
       await this.cartItemRepository.save(cartItem);
     }
 
-    return this.getCartByUserId(dto.user_id);
+    return this.getCartByUserId(dto.user_id, dto.address_id);
   }
 
   async updateCartItem(
@@ -195,3 +286,4 @@ export class CartService {
     return { message: `Cart for user ${userId} successfully cleared` };
   }
 }
+

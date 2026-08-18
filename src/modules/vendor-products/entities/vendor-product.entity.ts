@@ -13,6 +13,7 @@ import {
 import { Vendor } from '../../vendors/entities/vendor.entity';
 import { ProductVariant } from '../../products/entities/product-variant.entity';
 import { Inventory } from '../../inventory/entities/inventory.entity';
+import { VendorProductStatus } from '../../../common/enums/enums';
 
 @Entity('vendor_products')
 @Index(['vendor_id', 'product_variant_id'], { unique: true })
@@ -32,8 +33,12 @@ export class VendorProduct {
   @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
   mrp: number;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: VendorProductStatus,
+    default: VendorProductStatus.ACTIVE,
+  })
+  status: VendorProductStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

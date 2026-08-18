@@ -1,11 +1,13 @@
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsEnum, IsString, IsOptional } from 'class-validator';
+import { OrderStatus } from '../../../common/enums/enums';
 
 export class UpdateOrderStatusDto {
   @IsNotEmpty()
-  @IsString()
-  status: string; // e.g. 'placed', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'
+  @IsEnum(OrderStatus)
+  status: OrderStatus;
 
   @IsOptional()
   @IsString()
   description?: string;
 }
+

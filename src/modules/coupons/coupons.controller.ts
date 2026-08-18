@@ -18,6 +18,7 @@ import { ApplyCouponDto } from './dto/apply-coupon.dto';
 import { RecordCouponUsageDto } from './dto/record-coupon-usage.dto';
 import { FilterCouponDto } from './dto/filter-coupon.dto';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { RESPONSE_MESSAGES } from '../../common/constants';
 
 @Controller('coupons')
 export class CouponsController {
@@ -25,63 +26,63 @@ export class CouponsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Coupon created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.CREATE_SUCCESS)
   create(@Body() dto: CreateCouponDto) {
     return this.couponsService.createCoupon(dto);
   }
 
   @Post('apply')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupon validated and applied successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.APPLY_SUCCESS)
   validateAndApplyCoupon(@Body() dto: ApplyCouponDto) {
     return this.couponsService.validateAndApplyCoupon(dto);
   }
 
   @Post('record-usage')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupon usage recorded successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.RECORD_USAGE_SUCCESS)
   recordUsage(@Body() dto: RecordCouponUsageDto) {
     return this.couponsService.recordUsage(dto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupons fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.FETCH_ALL_SUCCESS)
   findAll(@Query() filterDto: FilterCouponDto) {
     return this.couponsService.findAll(filterDto);
   }
 
   @Get('code/:code')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupon details fetched by code successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.FETCH_CODE_SUCCESS)
   findByCode(@Param('code') code: string) {
     return this.couponsService.findByCode(code);
   }
 
   @Get('usages/coupon/:couponId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupon usage history fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.FETCH_USAGES_COUPON_SUCCESS)
   getUsagesByCoupon(@Param('couponId', ParseIntPipe) couponId: number) {
     return this.couponsService.getUsagesByCoupon(couponId);
   }
 
   @Get('usages/user/:userId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('User coupon usage history fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.FETCH_USAGES_USER_SUCCESS)
   getUsagesByUser(@Param('userId', ParseIntPipe) userId: number) {
     return this.couponsService.getUsagesByUser(userId);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupon details fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.FETCH_ONE_SUCCESS)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.couponsService.findOne(id);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupon updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.UPDATE_SUCCESS)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCouponDto,
@@ -91,7 +92,7 @@ export class CouponsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Coupon deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.COUPONS.DELETE_SUCCESS)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.couponsService.remove(id);
   }

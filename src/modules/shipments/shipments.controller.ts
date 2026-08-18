@@ -16,6 +16,7 @@ import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentStatusDto } from './dto/update-shipment-status.dto';
 import { FilterShipmentDto } from './dto/filter-shipment.dto';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { RESPONSE_MESSAGES } from '../../common/constants';
 
 @Controller('shipments')
 export class ShipmentsController {
@@ -23,28 +24,28 @@ export class ShipmentsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Shipment created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.CREATE_SUCCESS)
   create(@Body() dto: CreateShipmentDto) {
     return this.shipmentsService.createShipment(dto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Shipments fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.FETCH_ALL_SUCCESS)
   findAll(@Query() filterDto: FilterShipmentDto) {
     return this.shipmentsService.findAll(filterDto);
   }
 
   @Get('order/:orderId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Shipments fetched by order ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.FETCH_ORDER_SUCCESS)
   findByOrder(@Param('orderId', ParseIntPipe) orderId: number) {
     return this.shipmentsService.findByOrder(orderId);
   }
 
   @Get('order-vendor/:orderVendorId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Shipment fetched by order vendor package ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.FETCH_VENDOR_ORDER_SUCCESS)
   findByVendorOrder(
     @Param('orderVendorId', ParseIntPipe) orderVendorId: number,
   ) {
@@ -53,21 +54,21 @@ export class ShipmentsController {
 
   @Get('agent/:agentId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Shipments fetched by delivery agent ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.FETCH_AGENT_SUCCESS)
   findByDeliveryAgent(@Param('agentId', ParseIntPipe) agentId: number) {
     return this.shipmentsService.findByDeliveryAgent(agentId);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Shipment details fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.FETCH_ONE_SUCCESS)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.shipmentsService.findOne(id);
   }
 
   @Patch(':id/status')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Shipment status updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.UPDATE_STATUS_SUCCESS)
   updateShipmentStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateShipmentStatusDto,
@@ -77,7 +78,7 @@ export class ShipmentsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Shipment deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.SHIPMENTS.DELETE_SUCCESS)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.shipmentsService.remove(id);
   }

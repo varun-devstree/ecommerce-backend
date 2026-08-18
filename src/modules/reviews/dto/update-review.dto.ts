@@ -1,4 +1,5 @@
-import { IsOptional, IsInt, Min, Max, IsString } from 'class-validator';
+import { IsOptional, IsInt, Min, Max, IsString, IsEnum } from 'class-validator';
+import { ReviewStatus } from '../../../common/enums/enums';
 
 export class UpdateReviewDto {
   @IsOptional()
@@ -16,6 +17,6 @@ export class UpdateReviewDto {
   comment?: string;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(ReviewStatus)
+  status?: ReviewStatus;
 }

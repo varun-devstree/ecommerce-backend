@@ -13,6 +13,8 @@ import { Order } from './order.entity';
 import { Vendor } from '../../vendors/entities/vendor.entity';
 import { OrderItem } from './order-item.entity';
 
+import { OrderStatus } from '../../../common/enums/enums';
+
 @Entity('order_vendors')
 @Index(['order_id', 'vendor_id'], { unique: true })
 export class OrderVendor {
@@ -34,8 +36,12 @@ export class OrderVendor {
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   total_amount: number;
 
-  @Column({ type: 'varchar', length: 50, default: 'placed' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PLACED,
+  })
+  status: OrderStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

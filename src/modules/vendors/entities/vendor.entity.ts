@@ -8,6 +8,8 @@ import {
 } from 'typeorm';
 import { VendorUser } from './vendor-user.entity';
 
+import { VendorStatus } from '../../../common/enums/enums';
+
 @Entity('vendors')
 export class Vendor {
   @PrimaryGeneratedColumn()
@@ -25,8 +27,12 @@ export class Vendor {
   @Column({ type: 'varchar', length: 20 })
   mobile_number: string;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: VendorStatus,
+    default: VendorStatus.ACTIVE,
+  })
+  status: VendorStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

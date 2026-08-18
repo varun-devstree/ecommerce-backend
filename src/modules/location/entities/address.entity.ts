@@ -12,6 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { Country } from './country.entity';
 import { State } from './state.entity';
 import { City } from './city.entity';
+import { CommonStatus } from '../../../common/enums/enums';
 
 @Entity('addresses')
 export class Address {
@@ -51,8 +52,12 @@ export class Address {
   @Column({ type: 'boolean', default: false })
   is_default: boolean;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: CommonStatus,
+    default: CommonStatus.ACTIVE,
+  })
+  status: CommonStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

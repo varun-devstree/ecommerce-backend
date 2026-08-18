@@ -7,6 +7,7 @@ import { OrderVendor } from '../orders/entities/order-vendor.entity';
 import { DeliveryAgent } from '../delivery-agents/entities/delivery-agent.entity';
 import { OrdersService } from '../orders/orders.service';
 import { NotFoundException } from '@nestjs/common';
+import { ShipmentStatus, OrderStatus } from '../../common/enums/enums';
 
 describe('ShipmentsService', () => {
   let service: ShipmentsService;
@@ -104,23 +105,24 @@ describe('ShipmentsService', () => {
         id: 100,
         order_id: 1,
         carrier: 'FedEx',
-        shipment_status: 'in_transit',
+        shipment_status: ShipmentStatus.IN_TRANSIT,
       };
       mockShipmentRepository.findOne.mockResolvedValue(shipmentObj);
       mockShipmentRepository.save.mockResolvedValue({
         ...shipmentObj,
-        shipment_status: 'delivered',
+        shipment_status: ShipmentStatus.DELIVERED,
       });
 
       const res = await service.updateShipmentStatus(100, {
-        shipment_status: 'delivered',
+        shipment_status: ShipmentStatus.DELIVERED,
       });
 
       expect(res).toBeDefined();
       expect(mockOrdersService.updateOrderStatus).toHaveBeenCalledWith(1, {
-        status: 'delivered',
+        status: OrderStatus.DELIVERED,
         description: expect.any(String),
       });
     });
   });
 });
+

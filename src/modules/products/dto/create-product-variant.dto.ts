@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsEnum } from 'class-validator';
+import { ProductStatus } from '../../../common/enums/enums';
 
 export class CreateProductVariantDto {
   @IsNotEmpty()
@@ -10,6 +11,7 @@ export class CreateProductVariantDto {
   variant_name?: string;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(ProductStatus)
+  status?: ProductStatus = ProductStatus.ACTIVE;
 }
+

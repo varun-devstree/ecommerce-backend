@@ -11,6 +11,7 @@ import { Product } from '../products/entities/product.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { FilterReviewDto } from './dto/filter-review.dto';
+import { ReviewStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class ReviewsService {
@@ -55,7 +56,7 @@ export class ReviewsService {
       rating: dto.rating,
       title: dto.title,
       comment: dto.comment,
-      status: 'active',
+      status: ReviewStatus.ACTIVE,
     });
 
     const savedReview = await this.reviewRepository.save(review);
@@ -117,7 +118,11 @@ export class ReviewsService {
     productId: number,
     filterDto?: FilterReviewDto,
   ): Promise<{ data: Review[]; total: number; page: number; limit: number }> {
-    return this.findAll({ ...filterDto, product_id: productId, status: 'active' });
+    return this.findAll({
+      ...filterDto,
+      product_id: productId,
+      status: ReviewStatus.ACTIVE,
+    });
   }
 
   async findByUser(
@@ -151,7 +156,7 @@ export class ReviewsService {
 
   async removeReview(id: number): Promise<{ message: string }> {
     const review = await this.findOne(id);
-    review.status = 'deleted';
+    review.status = ReviewStatus.DELETED;
     await this.reviewRepository.save(review);
     await this.reviewRepository.softRemove(review);
     await this.recalculateProductRating(review.product_id);
@@ -165,7 +170,7 @@ export class ReviewsService {
       .select('AVG(review.rating)', 'avgRating')
       .addSelect('COUNT(review.id)', 'reviewCount')
       .where('review.product_id = :productId', { productId })
-      .andWhere('review.status = :status', { status: 'active' })
+      .andWhere('review.status = :status', { status: ReviewStatus.ACTIVE })
       .getRawOne();
 
     const avgRating = result?.avgRating ? parseFloat(result.avgRating) : 0;

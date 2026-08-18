@@ -13,6 +13,7 @@ import { InventoryService } from '../inventory/inventory.service';
 import { CreateVendorProductDto } from './dto/create-vendor-product.dto';
 import { UpdateVendorProductDto } from './dto/update-vendor-product.dto';
 import { FilterVendorProductDto } from './dto/filter-vendor-product.dto';
+import { VendorProductStatus } from '../../common/enums/enums';
 
 @Injectable()
 export class VendorProductsService {
@@ -66,7 +67,7 @@ export class VendorProductsService {
       product_variant_id: dto.product_variant_id,
       selling_price: dto.selling_price,
       mrp: dto.mrp,
-      status: dto.status || 'active',
+      status: dto.status || VendorProductStatus.ACTIVE,
     });
 
     const savedVendorProduct = await this.vendorProductRepository.save(vendorProduct);
@@ -145,7 +146,7 @@ export class VendorProductsService {
 
   async findByVariant(variantId: number): Promise<VendorProduct[]> {
     return this.vendorProductRepository.find({
-      where: { product_variant_id: variantId, status: 'active' },
+      where: { product_variant_id: variantId, status: VendorProductStatus.ACTIVE },
       relations: {
         vendor: true,
         inventory: true,
@@ -184,7 +185,7 @@ export class VendorProductsService {
 
   async remove(id: number): Promise<{ message: string }> {
     const vp = await this.findOne(id);
-    vp.status = 'deleted';
+    vp.status = VendorProductStatus.DELETED;
     await this.vendorProductRepository.save(vp);
     await this.vendorProductRepository.softRemove(vp);
     return { message: `Vendor product with ID ${id} soft deleted successfully` };

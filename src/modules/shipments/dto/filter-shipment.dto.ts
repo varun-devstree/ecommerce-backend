@@ -1,5 +1,6 @@
-import { IsOptional, IsInt, IsString, Min } from 'class-validator';
+import { IsOptional, IsInt, IsEnum, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ShipmentStatus } from '../../../common/enums/enums';
 
 export class FilterShipmentDto {
   @IsOptional()
@@ -18,8 +19,8 @@ export class FilterShipmentDto {
   delivery_agent_id?: number;
 
   @IsOptional()
-  @IsString()
-  shipment_status?: string;
+  @IsEnum(ShipmentStatus)
+  shipment_status?: ShipmentStatus;
 
   @IsOptional()
   @Type(() => Number)

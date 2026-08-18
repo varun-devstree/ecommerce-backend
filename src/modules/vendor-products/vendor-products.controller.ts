@@ -16,6 +16,7 @@ import { CreateVendorProductDto } from './dto/create-vendor-product.dto';
 import { UpdateVendorProductDto } from './dto/update-vendor-product.dto';
 import { FilterVendorProductDto } from './dto/filter-vendor-product.dto';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { RESPONSE_MESSAGES } from '../../common/constants';
 
 @Controller('vendor-products')
 export class VendorProductsController {
@@ -23,42 +24,42 @@ export class VendorProductsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Vendor product created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.VENDOR_PRODUCTS.CREATE_SUCCESS)
   create(@Body() dto: CreateVendorProductDto) {
     return this.vendorProductsService.create(dto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Vendor products fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.VENDOR_PRODUCTS.FETCH_ALL_SUCCESS)
   findAll(@Query() filterDto: FilterVendorProductDto) {
     return this.vendorProductsService.findAll(filterDto);
   }
 
   @Get('vendor/:vendorId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Vendor products fetched by vendor ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.VENDOR_PRODUCTS.FETCH_VENDOR_SUCCESS)
   findByVendor(@Param('vendorId', ParseIntPipe) vendorId: number) {
     return this.vendorProductsService.findByVendor(vendorId);
   }
 
   @Get('variant/:variantId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Vendor products fetched by variant ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.VENDOR_PRODUCTS.FETCH_VARIANT_SUCCESS)
   findByVariant(@Param('variantId', ParseIntPipe) variantId: number) {
     return this.vendorProductsService.findByVariant(variantId);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Vendor product details fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.VENDOR_PRODUCTS.FETCH_ONE_SUCCESS)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.vendorProductsService.findOne(id);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Vendor product updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.VENDOR_PRODUCTS.UPDATE_SUCCESS)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateVendorProductDto,
@@ -68,7 +69,7 @@ export class VendorProductsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Vendor product deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.VENDOR_PRODUCTS.DELETE_SUCCESS)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.vendorProductsService.remove(id);
   }

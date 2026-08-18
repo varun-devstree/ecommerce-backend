@@ -24,6 +24,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { RESPONSE_MESSAGES } from '../../common/constants';
 
 @Controller('products')
 export class ProductsController {
@@ -32,14 +33,14 @@ export class ProductsController {
   // --- PRODUCT ENDPOINTS ---
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Products fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.FETCH_ALL_SUCCESS)
   findAll() {
     return this.productsService.findAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product details fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.FETCH_ONE_SUCCESS)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.findOne(id);
   }
@@ -48,7 +49,7 @@ export class ProductsController {
   @Roles('admin')
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Product created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.CREATE_SUCCESS)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.createProduct(createProductDto);
   }
@@ -57,7 +58,7 @@ export class ProductsController {
   @Roles('admin')
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.UPDATE_SUCCESS)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
@@ -69,7 +70,7 @@ export class ProductsController {
   @Roles('admin')
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.DELETE_SUCCESS)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.removeProduct(id);
   }
@@ -79,7 +80,7 @@ export class ProductsController {
   @Roles('admin')
   @Post(':productId/variants')
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Product variant created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.CREATE_VARIANT_SUCCESS)
   createVariant(
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: CreateProductVariantDto,
@@ -89,7 +90,7 @@ export class ProductsController {
 
   @Get(':productId/variants')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product variants fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.FETCH_VARIANTS_SUCCESS)
   findVariantsByProduct(@Param('productId', ParseIntPipe) productId: number) {
     return this.productsService.findVariantsByProduct(productId);
   }
@@ -98,7 +99,7 @@ export class ProductsController {
   @Roles('admin')
   @Patch('variants/:id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product variant updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.UPDATE_VARIANT_SUCCESS)
   updateVariant(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateProductVariantDto,
@@ -110,7 +111,7 @@ export class ProductsController {
   @Roles('admin')
   @Delete('variants/:id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product variant deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.DELETE_VARIANT_SUCCESS)
   removeVariant(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.removeVariant(id);
   }
@@ -120,7 +121,7 @@ export class ProductsController {
   @Roles('admin')
   @Post(':productId/attributes')
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Product attribute created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.CREATE_ATTRIBUTE_SUCCESS)
   createAttribute(
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: CreateProductAttributeDto,
@@ -130,7 +131,7 @@ export class ProductsController {
 
   @Get(':productId/attributes')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product attributes fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.FETCH_ATTRIBUTES_SUCCESS)
   findAttributesByProduct(@Param('productId', ParseIntPipe) productId: number) {
     return this.productsService.findAttributesByProduct(productId);
   }
@@ -139,7 +140,7 @@ export class ProductsController {
   @Roles('admin')
   @Patch('attributes/:id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product attribute updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.UPDATE_ATTRIBUTE_SUCCESS)
   updateAttribute(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateProductAttributeDto,
@@ -151,7 +152,7 @@ export class ProductsController {
   @Roles('admin')
   @Delete('attributes/:id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product attribute deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.DELETE_ATTRIBUTE_SUCCESS)
   removeAttribute(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.removeAttribute(id);
   }
@@ -161,7 +162,7 @@ export class ProductsController {
   @Roles('admin')
   @Post(':productId/images')
   @HttpCode(HttpStatus.CREATED)
-  @ResponseMessage('Product image created successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.CREATE_IMAGE_SUCCESS)
   createImage(
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: CreateProductImageDto,
@@ -171,7 +172,7 @@ export class ProductsController {
 
   @Get(':productId/images')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product images fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.FETCH_IMAGES_SUCCESS)
   findImagesByProduct(@Param('productId', ParseIntPipe) productId: number) {
     return this.productsService.findImagesByProduct(productId);
   }
@@ -180,7 +181,7 @@ export class ProductsController {
   @Roles('admin')
   @Patch('images/:id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product image updated successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.UPDATE_IMAGE_SUCCESS)
   updateImage(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateProductImageDto,
@@ -192,7 +193,7 @@ export class ProductsController {
   @Roles('admin')
   @Delete('images/:id')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Product image deleted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.PRODUCTS.DELETE_IMAGE_SUCCESS)
   removeImage(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.removeImage(id);
   }

@@ -5,7 +5,9 @@ import {
   IsInt,
   IsNumber,
   Min,
+  IsEnum,
 } from 'class-validator';
+import { VendorProductStatus } from '../../../common/enums/enums';
 
 export class CreateVendorProductDto {
   @IsNotEmpty()
@@ -27,8 +29,8 @@ export class CreateVendorProductDto {
   mrp?: number;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(VendorProductStatus)
+  status?: VendorProductStatus = VendorProductStatus.ACTIVE;
 
   @IsOptional()
   @IsInt()

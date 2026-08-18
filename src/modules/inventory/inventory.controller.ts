@@ -16,6 +16,7 @@ import { ReleaseInventoryDto } from './dto/release-inventory.dto';
 import { DeductInventoryDto } from './dto/deduct-inventory.dto';
 import { FilterInventoryHistoryDto } from './dto/filter-inventory-history.dto';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { RESPONSE_MESSAGES } from '../../common/constants';
 
 @Controller('inventory')
 export class InventoryController {
@@ -23,14 +24,14 @@ export class InventoryController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Inventory records fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.FETCH_ALL_SUCCESS)
   findAll() {
     return this.inventoryService.findAll();
   }
 
   @Get('low-stock')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Low stock inventory items fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.FETCH_LOW_STOCK_SUCCESS)
   getLowStock(@Query('threshold') threshold?: string) {
     const numericThreshold = threshold ? parseInt(threshold, 10) : 10;
     return this.inventoryService.getLowStock(numericThreshold);
@@ -38,14 +39,14 @@ export class InventoryController {
 
   @Get('history')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('All inventory history logs fetched successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.FETCH_ALL_HISTORY_SUCCESS)
   findAllHistory(@Query() filterDto: FilterInventoryHistoryDto) {
     return this.inventoryService.findAllHistory(filterDto);
   }
 
   @Get('history/:vendorProductId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Inventory history logs fetched by vendor product ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.FETCH_VP_HISTORY_SUCCESS)
   findHistoryByVendorProduct(
     @Param('vendorProductId', ParseIntPipe) vendorProductId: number,
     @Query() filterDto: FilterInventoryHistoryDto,
@@ -58,7 +59,7 @@ export class InventoryController {
 
   @Get('vendor-product/:vendorProductId')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Inventory fetched by vendor product ID successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.FETCH_VP_SUCCESS)
   findByVendorProduct(
     @Param('vendorProductId', ParseIntPipe) vendorProductId: number,
   ) {
@@ -67,28 +68,28 @@ export class InventoryController {
 
   @Post('adjust')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Inventory stock adjusted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.ADJUST_SUCCESS)
   adjustInventory(@Body() dto: AdjustInventoryDto) {
     return this.inventoryService.adjustInventory(dto);
   }
 
   @Post('reserve')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Inventory stock reserved successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.RESERVE_SUCCESS)
   reserveInventory(@Body() dto: ReserveInventoryDto) {
     return this.inventoryService.reserveInventory(dto);
   }
 
   @Post('release')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Inventory stock released successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.RELEASE_SUCCESS)
   releaseInventory(@Body() dto: ReleaseInventoryDto) {
     return this.inventoryService.releaseInventory(dto);
   }
 
   @Post('deduct')
   @HttpCode(HttpStatus.OK)
-  @ResponseMessage('Inventory stock deducted successfully')
+  @ResponseMessage(RESPONSE_MESSAGES.INVENTORY.DEDUCT_SUCCESS)
   deductInventory(@Body() dto: DeductInventoryDto) {
     return this.inventoryService.deductInventory(dto);
   }
