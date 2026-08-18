@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -25,7 +26,11 @@ export class ProductImage {
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
+
   @ManyToOne(() => Product, (product) => product.images, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 }
+

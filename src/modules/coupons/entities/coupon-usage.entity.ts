@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   JoinColumn,
   Index,
@@ -31,6 +32,10 @@ export class CouponUsage {
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
+
 
   @ManyToOne(() => Coupon, (coupon) => coupon.usages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'coupon_id' })

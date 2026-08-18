@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
 import { CouponUsage } from './coupon-usage.entity';
@@ -45,6 +46,10 @@ export class Coupon {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
+
 
   @OneToMany(() => CouponUsage, (usage) => usage.coupon)
   usages: CouponUsage[];

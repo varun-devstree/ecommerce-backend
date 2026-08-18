@@ -5,6 +5,11 @@ import { OrderAddress } from './entities/order-address.entity';
 import { OrderVendor } from './entities/order-vendor.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderStatusHistory } from './entities/order-status-history.entity';
+import { User } from '../users/entities/user.entity';
+import { VendorProduct } from '../vendor-products/entities/vendor-product.entity';
+import { Address } from '../location/entities/address.entity';
+import { InventoryModule } from '../inventory/inventory.module';
+import { CartModule } from '../cart/cart.module';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 
@@ -16,7 +21,12 @@ import { OrdersController } from './orders.controller';
       OrderVendor,
       OrderItem,
       OrderStatusHistory,
+      User,
+      VendorProduct,
+      Address,
     ]),
+    InventoryModule,
+    CartModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

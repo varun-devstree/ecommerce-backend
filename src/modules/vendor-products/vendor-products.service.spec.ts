@@ -20,8 +20,10 @@ describe('VendorProductsService', () => {
     create: jest.fn(),
     save: jest.fn(),
     remove: jest.fn(),
+    softRemove: jest.fn(),
     createQueryBuilder: jest.fn(),
   };
+
 
   const mockVendorRepository = {
     findOne: jest.fn(),

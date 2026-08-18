@@ -283,8 +283,10 @@ export class ProductsService {
 
   async removeVariant(id: number) {
     const variant = await this.findVariantById(id);
-    await this.variantRepository.remove(variant);
-    return { message: `Variant with ID ${id} deleted successfully` };
+    variant.status = 'deleted';
+    await this.variantRepository.save(variant);
+    await this.variantRepository.softRemove(variant);
+    return { message: `Variant with ID ${id} soft deleted successfully` };
   }
 
   // --- PRODUCT ATTRIBUTES CRUD ---
@@ -318,8 +320,8 @@ export class ProductsService {
 
   async removeAttribute(id: number) {
     const attribute = await this.findAttributeById(id);
-    await this.attributeRepository.remove(attribute);
-    return { message: `Attribute with ID ${id} deleted successfully` };
+    await this.attributeRepository.softRemove(attribute);
+    return { message: `Attribute with ID ${id} soft deleted successfully` };
   }
 
   // --- PRODUCT IMAGES CRUD ---
@@ -356,7 +358,8 @@ export class ProductsService {
 
   async removeImage(id: number) {
     const image = await this.findImageById(id);
-    await this.imageRepository.remove(image);
-    return { message: `Image with ID ${id} deleted successfully` };
+    await this.imageRepository.softRemove(image);
+    return { message: `Image with ID ${id} soft deleted successfully` };
   }
+
 }
